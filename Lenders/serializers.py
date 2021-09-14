@@ -8,20 +8,21 @@ class FileUploadSerializer(serializers.Serializer):
     def validate(self, attrs):
         super().validate(attrs)
         file = attrs['file']
-        extension = file.name.split(".")[-1]
-        if extension != 'csv':
+        extension = file.name.split(".")[-1] # splitting the file name that is being uploaded and taking the last string
+        if extension != 'csv': # checking the extension of the file and raising a validation error
             raise serializers.ValidationError({'file': 'Please upload a CSV file.'})
+        # creating a list to show the correct format of headers
         valid_column = ['Name', 'Code', 'Upfront Commission Rate', 'Trial Commission Rate', 'Active Status']
-
         decoded_file = file.read().decode('utf-8').splitlines()
-        self.csv_reader = csv.DictReader(decoded_file)
+        self.csv_reader = csv.DictReader(decoded_file) # reading the file using the csv import
         headers = self.csv_reader.fieldnames
-        if headers != valid_column:
+        if headers != valid_column: # checking if the headers match the pre defined header (valid_column)
             raise serializers.ValidationError({'file': 'This file is not valid.'})
-
         return attrs
 
     def create(self, validated_data):
+        # Created the column_mapper to show the format that is taken to write the data.
+        # Code written in line 37 canbe used too.
         column_mapper = {
             'Name': 'name',
             'Code': 'code',
